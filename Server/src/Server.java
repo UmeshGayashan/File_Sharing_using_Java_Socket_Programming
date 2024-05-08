@@ -1,6 +1,6 @@
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -13,27 +13,39 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+
 public class Server {
     static ArrayList<MyFile> myFiles = new ArrayList<>();
+
     public static void main(String[] args) throws IOException {
 
+        // add firewall rule
+        addFirewallRule();
         int fileId = 0;
 
         JFrame jFrame = new JFrame("Network Programming Server");
-        jFrame.setSize(400,400);
-        jFrame.setLayout(new BoxLayout(jFrame.getContentPane(),BoxLayout.Y_AXIS));
+        jFrame.setSize(400, 400);
+        jFrame.setLayout(new BoxLayout(jFrame.getContentPane(), BoxLayout.Y_AXIS));
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //Panel
+        // Panel
         JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel,BoxLayout.Y_AXIS));
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
 
         JScrollPane jScrollPane = new JScrollPane(jPanel);
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         JLabel jlTitle = new JLabel("Network Programming Receiver");
         jlTitle.setFont(new Font("Arial", Font.BOLD, 25));
-        jlTitle.setBorder(new EmptyBorder(20,0,10,0));
+        jlTitle.setBorder(new EmptyBorder(20, 0, 10, 0));
         jlTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         jFrame.add(jlTitle);
@@ -42,37 +54,40 @@ public class Server {
 
         ServerSocket serverSocket = new ServerSocket(1234);
 
-        while(true){
-            try{
+        while (true) {
+            try {
+
+                System.out.println("Server is running. Waiting for client connection...");
                 Socket socket = serverSocket.accept();
+                System.out.println("Client connected.");
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-                int fileNameLength =  dataInputStream.readInt();
-                if (fileNameLength > 0){
+                int fileNameLength = dataInputStream.readInt();
+                if (fileNameLength > 0) {
                     byte[] fileNameBytes = new byte[fileNameLength];
-                    dataInputStream.readFully(fileNameBytes,0,fileNameBytes.length);
+                    dataInputStream.readFully(fileNameBytes, 0, fileNameBytes.length);
                     String fileName = new String(fileNameBytes);
 
                     int fileContentLength = dataInputStream.readInt();
 
-                    if(fileContentLength > 0){
+                    if (fileContentLength > 0) {
                         byte[] fileContentBytes = new byte[fileContentLength];
-                        dataInputStream.readFully(fileContentBytes,0,fileContentLength);
+                        dataInputStream.readFully(fileContentBytes, 0, fileContentLength);
 
                         JPanel jpFileRow = new JPanel();
-                        jpFileRow.setLayout(new BoxLayout(jpFileRow,BoxLayout.Y_AXIS));
+                        jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.Y_AXIS));
 
                         JLabel jlFileName = new JLabel(fileName);
                         jlFileName.setFont(new Font("Arial", Font.BOLD, 20));
-                        jlFileName.setBorder(new EmptyBorder(10,0,10,0));
+                        jlFileName.setBorder(new EmptyBorder(10, 0, 10, 0));
 
-                        if(getFileExtension(fileName).equalsIgnoreCase("txt")){
+                        if (getFileExtension(fileName).equalsIgnoreCase("txt")) {
                             jpFileRow.setName(String.valueOf(fileId));
                             jpFileRow.addMouseListener(getMyMouseListener());
 
                             jpFileRow.add(jlFileName);
                             jPanel.add(jpFileRow);
                             jFrame.validate();
-                        }else{
+                        } else {
                             jpFileRow.setName(String.valueOf(fileId));
                             jpFileRow.addMouseListener(getMyMouseListener());
 
@@ -81,17 +96,17 @@ public class Server {
 
                             jFrame.validate();
                         }
-                        myFiles.add(new MyFile(fileId,fileName,fileContentBytes,getFileExtension(fileName)));
+                        myFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
                     }
 
-
                 }
-            } catch (IOException err){
+            } catch (IOException err) {
                 err.printStackTrace();
             }
         }
     }
-    public static MouseListener getMyMouseListener(){
+
+    public static MouseListener getMyMouseListener() {
         return new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -130,46 +145,46 @@ public class Server {
 
     public static JFrame createFrame(String fileName, byte[] fileData, String fileExtension) {
         JFrame jframe = new JFrame("File Downloader");
-        jframe.setSize(400,400);
+        jframe.setSize(400, 400);
 
         JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel,BoxLayout.Y_AXIS));
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
 
         JLabel jlTitle = new JLabel("New File Downloader");
         jlTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jlTitle.setFont(new Font("Arial",Font.BOLD,25));
-        jlTitle.setBorder(new EmptyBorder(20,0,10,0));
+        jlTitle.setFont(new Font("Arial", Font.BOLD, 25));
+        jlTitle.setBorder(new EmptyBorder(20, 0, 10, 0));
 
-        JLabel jlPrompt = new JLabel("Are you  sure you want to download "+ fileName);
+        JLabel jlPrompt = new JLabel("Are you  sure you want to download " + fileName);
         jlPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jlPrompt.setFont(new Font("Arial",Font.BOLD,20));
-        jlPrompt.setBorder(new EmptyBorder(20,0,10,0));
+        jlPrompt.setFont(new Font("Arial", Font.BOLD, 20));
+        jlPrompt.setBorder(new EmptyBorder(20, 0, 10, 0));
 
         JButton jbYes = new JButton("Yes");
-        jbYes.setPreferredSize(new Dimension(150,75));
-        jbYes.setFont((new Font("Arial",Font.BOLD,20)));
+        jbYes.setPreferredSize(new Dimension(150, 75));
+        jbYes.setFont((new Font("Arial", Font.BOLD, 20)));
 
         JButton jbNo = new JButton("No");
-        jbNo.setPreferredSize(new Dimension(150,75));
-        jbNo.setFont((new Font("Arial",Font.BOLD,20)));
+        jbNo.setPreferredSize(new Dimension(150, 75));
+        jbNo.setFont((new Font("Arial", Font.BOLD, 20)));
 
         JLabel jlFileContent = new JLabel();
         jlFileContent.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel jpButtons = new JPanel();
-        jpButtons.setBorder(new EmptyBorder(20,0,10,0));
+        jpButtons.setBorder(new EmptyBorder(20, 0, 10, 0));
         jpButtons.add(jbYes);
         jpButtons.add(jbNo);
 
-        if(fileExtension.equalsIgnoreCase("txt")){
-            jlFileContent.setText("<html>"+new String(fileData)+"</html>");
-        }else{
+        if (fileExtension.equalsIgnoreCase("txt")) {
+            jlFileContent.setText("<html>" + new String(fileData) + "</html>");
+        } else {
             jlFileContent.setIcon(new ImageIcon(fileData));
         }
         jbYes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                File fileToDownload =new File(fileName);
+                File fileToDownload = new File(fileName);
                 try {
                     FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload);
 
@@ -177,7 +192,7 @@ public class Server {
                     fileOutputStream.close();
 
                     jframe.dispose();
-                }catch (IOException err){
+                } catch (IOException err) {
                     err.printStackTrace();
                 }
             }
@@ -199,15 +214,35 @@ public class Server {
 
         return jframe;
     }
-    public static String getFileExtension(String fileName){
 
-        //Would not work with .tar.gz
+    public static String getFileExtension(String fileName) {
+
+        // Would not work with .tar.gz
         int i = fileName.lastIndexOf('.');
 
-        if (i>0){
-            return fileName.substring(i+1);
-        }else {
-            return  "No extension found";
+        if (i > 0) {
+            return fileName.substring(i + 1);
+        } else {
+            return "No extension found";
         }
     }
+
+    // firewall rule
+    private static void addFirewallRule() {
+        try {
+            String command = "powershell.exe";
+            String[] arguments = { "-Command",
+                    "New-NetFirewallRule -DisplayName 'AllowPort1234' -Direction Inbound -LocalPort 1234 -Protocol TCP -Action Allow" };
+
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.command(arguments);
+            Process process = pb.start();
+            process.waitFor();
+            System.out.println("Firewall rule running");
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
