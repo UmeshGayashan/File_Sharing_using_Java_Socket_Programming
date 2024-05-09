@@ -161,7 +161,7 @@ public class Client {
 
                 JFrame jfPreview = createFrame();
                 jfPreview.setVisible(true);
-                System.out.println(messageVector.get(0));
+
             }
         });
 
@@ -212,7 +212,7 @@ public class Client {
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String data = "";
-                if (list1.getSelectedIndex() != -1) {
+                if (list1.getSelectedIndex() != -1 && messageVector.size() != 0) {
                     String[] parts = separateIpAndHostName(list1.getSelectedValue());
                     data = "Reciever Selected: " + parts[1];
                     receiver = parts[0];
