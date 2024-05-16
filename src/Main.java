@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -37,8 +38,11 @@ public class Main {
         var6.setFont(new Font("Arial", 1, 20));
         var4.add(var5);
         var4.add(var6);
+
+        // Server
         var6.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent var1) {
+
                 Thread var2 = new Thread(new Runnable() {
                     public void run() {
                         try {
@@ -52,7 +56,10 @@ public class Main {
                 var2.start();
             }
         });
+
+        // Client
         var5.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent var1) {
                 Thread var2 = new Thread(new Runnable() {
                     public void run() {

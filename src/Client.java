@@ -34,6 +34,9 @@ public class Client {
 
     public static void main(String[] args) {
 
+        // start reciveing broacast message
+        new Thread(Client::listenForServers).start();
+
         final File[] fileToSend = new File[1];
 
         JFrame jFrame = new JFrame("Send File");
@@ -106,8 +109,6 @@ public class Client {
         // jFrame.add(serverPanel);
         jFrame.setVisible(true);
 
-        new Thread(Client::listenForServers).start();
-
         jbChooseFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -124,6 +125,7 @@ public class Client {
         jbSendFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 if (receiver.equals("")) {
                     jlFileName.setText("Please Choose a Reciever first.");
 
@@ -199,7 +201,7 @@ public class Client {
         JFrame f = new JFrame();
         final JLabel label = new JLabel();
         label.setSize(500, 100);
-        JButton b = new JButton("Show");
+        JButton b = new JButton("Select");
         b.setBounds(200, 150, 80, 30);
         final JList<String> list1 = new JList<>(messageVector);
         list1.setBounds(100, 100, 75, 75);
@@ -214,8 +216,8 @@ public class Client {
                 String data = "";
                 if (list1.getSelectedIndex() != -1 && messageVector.size() != 0) {
                     String[] parts = separateIpAndHostName(list1.getSelectedValue());
-                    data = "Reciever Selected: " + parts[1];
-                    receiver = parts[0];
+                    data = "Reciever Selected: " + parts[0];
+                    receiver = parts[1];
                     System.out.println(receiver);
                     label.setText(data);
                 }
@@ -229,8 +231,8 @@ public class Client {
 
     public static String[] separateIpAndHostName(String input) {
         String[] parts = input.split(":");
-        String ipAddress = parts[1];
-        String hostName = parts[3].trim();
+        String ipAddress = parts[0];
+        String hostName = parts[1].trim();
         return new String[] { ipAddress, hostName };
 
     }

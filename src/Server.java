@@ -27,6 +27,8 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
 
+        // start the broadcast
+
         Thread broadcastServerPresence = new Thread(new Runnable() {
             @Override
             public void run() {
